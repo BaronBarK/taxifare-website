@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 import requests
 import pandas as pd
+import urllib.parse
 
 st.markdown('''
 # Welcome to BaronBarK's TaxiFareModel 🚕
@@ -25,13 +26,21 @@ date = st.date_input(
 time = st.time_input('Ride time (HH:MM)',
                      datetime.time(12,0))
 
-pickup_long = st.number_input('Input the pick-up longitude', value=-73.977295)
+pickup_address = st.text_input('Pick-up location adress', value="Grand Central Terminal")
 
-pickup_lat = st.number_input('Input the pick-up latitude', value=40.752655)
+# getting pick-up location latitude and longitude
+pickup_url = 'https://nominatim.openstreetmap.org/search?q=' + urllib.parse.quote(pickup_address) +'&format=json'
+pickup = requests.get(pickup_url, headers={'User-Agent':'taxifare_baronbark'}).json()
+pickup_long = float(pickup[0]["lon"])
+pickup_lat = float(pickup[0]["lat"])
 
-dropoff_long = st.number_input('Input the drop-off longitude', value=-73.780968)
+dropoff_address = st.text_input('Drop-off location adress', value="JFK Airport")
 
-dropoff_lat = st.number_input('Input the drop-off latitude', value=40.641766)
+# getting drop-off location latitude and longitude
+dropoff_url = 'https://nominatim.openstreetmap.org/search?q=' + urllib.parse.quote(dropoff_address) +'&format=json'
+dropoff = requests.get(dropoff_url, headers={'User-Agent':'taxifare_baronbark'}).json()
+dropoff_long = float(dropoff[0]["lon"])
+dropoff_lat = float(dropoff[0]["lat"])
 
 passenger_count = st.number_input('How many passengers ?', value=1)
 
